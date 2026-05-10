@@ -1,0 +1,4 @@
+anthropic
+discord.py
+pytz
+mem0ai
