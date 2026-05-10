@@ -15,6 +15,7 @@ MEM0_API_KEY   = os.environ["MEM0_API_KEY"]
 TORONTO    = pytz.timezone("America/Toronto")
 MAX_ROUNDS = 20
 history    = []
+last_message_time = None
 USER_ID    = "discordbot"
 
 claude     = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
@@ -119,8 +120,23 @@ def generate_time_message(hour):
     return response.content[0].text
 
 def ask_claude(user_message):
+    global last_message_time
+    now      = datetime.now(TORONTO)
+    time_str = now.strftime("%A, %I:%M %p")
+
+    time_context = f"Current time: {time_str} Toronto time."
+    if last_message_time:
+        gap     = now - last_message_time
+        hours   = int(gap.total_seconds() // 3600)
+        minutes = int((gap.total_seconds() % 3600) // 60)
+        if hours > 0:
+            time_context += f" Time since user's last message: {hours}h {minutes}m."
+        else:
+            time_context += f" Time since user's last message: {minutes}m."
+    last_message_time = now
+
     memories = get_memories()
-    system   = SYSTEM_PROMPT
+    system   = SYSTEM_PROMPT + f"\n\n{time_context}"
     if memories:
         system += f"\n\nMemories about the user:\n{memories}"
     messages = list(history) + [{"role": "user", "content": user_message}]
