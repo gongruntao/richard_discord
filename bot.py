@@ -142,7 +142,7 @@ def ask_claude(user_message):
     messages = list(history) + [{"role": "user", "content": user_message}]
     response = claude.messages.create(
         model="claude-sonnet-4-6",
-        max_tokens=300,
+        max_tokens=2000,
         system=system,
         messages=messages
     )
