@@ -205,10 +205,14 @@ async def main():
         if message.author == client.user:
             return
         if message.channel.id == CHANNEL_ID:
-            delay = get_reply_delay(message.content)
-            await asyncio.sleep(delay)
-            reply = ask_claude(message.content)
-            await message.channel.send(reply)
+            try:
+                delay = get_reply_delay(message.content)
+                await asyncio.sleep(delay)
+                reply = ask_claude(message.content)
+                await message.channel.send(reply)
+            except Exception as e:
+                print(f"on_message error: {e}")
+                await message.channel.send("Sorry, something went wrong on my end.")
 
     await client.start(DISCORD_TOKEN)
 
